@@ -8,17 +8,17 @@
 </head>
 <body>
     <div class="all">
-        <h1>CALCULADORA DE IMC</h1>
-        <div>
+        <div class="imc">
+            <h1></h1>
+            <h1>CALCULADORA DE IMC</h1>
             <h3>Qual seu nome ?</h3>
             <input type="text" class="inputName">
             <h3>Quanto você pesa atualmente ?</h3>
             <input type="text" class="inputPeso">
             <h3>Qual é a sua altura ?</h3>
             <input type="text" class="inputAltura"><br>
-            <button onclick="formSend()">Enviar</button>
+            <button onclick="formSend()" class="enviar">Enviar</button>
         </div>
-        <div class="result"></div>
         <div class="historico"></div>
     </div>
     <script src="./script.js"></script>

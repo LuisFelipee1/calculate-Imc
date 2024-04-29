@@ -1,11 +1,9 @@
-const historico = [];
-
-function calcularIMC(peso, altura) {
+function ImcCalculate(peso, altura) {
     const alturaMetros = altura / 100; 
     return peso / (alturaMetros * alturaMetros);
 }
 
-function classificacaoIMC(imc) {
+function imcFilter(imc) {
     if (imc < 18.5) {
         return 'Abaixo do peso';
     } else if (imc >= 18.5 && imc < 25) {
@@ -18,70 +16,59 @@ function classificacaoIMC(imc) {
 }
 
 function formatarData(data) {
+    data = new Date(data);
     const dia = String(data.getDate()).padStart(2, '0');
     const mes = String(data.getMonth() + 1).padStart(2, '0');
     const ano = data.getFullYear();
     return `${dia}/${mes}/${ano}`;
 }
 
-function mostrarHistorico() {
-    const historicoDiv = document.querySelector('.historico');
-    historicoDiv.innerHTML = '';
+function showHistory(param) {
+    const div = document.querySelector('.historico');
+    div.innerHTML = '';
 
-    historico.forEach((teste, index) => {
+    param.forEach((teste) => {
         const p = document.createElement('p');
         const dataFormatada = formatarData(teste.data);
-        const classificacao = classificacaoIMC(teste.imc);
-        p.textContent = `Nome: ${teste.nome}, Data do teste: ${dataFormatada}, Peso: ${teste.peso} kg, Altura: ${teste.altura} cm, IMC: ${teste.imc.toFixed(2)}, Classificação: ${classificacao}`;
+        const classificacao = imcFilter(teste.imc);
+        p.innerHTML = `Nome: ${teste.nome}<br> Data do teste: ${dataFormatada}<br> Peso: ${teste.peso} kg <br> Altura: ${teste.altura} cm<br> IMC: ${teste.imc.toFixed(2)}<br> Classificação: ${classificacao}<br>`;
         
+        const divEachHistory = document.createElement('div');
+        divEachHistory.classList.add('eachUser')
         const btnExcluir = document.createElement('button');
+        btnExcluir.classList.add('excluir');
         btnExcluir.textContent = 'Excluir';
-        btnExcluir.addEventListener('click', () => excluirTeste(index));
+        btnExcluir.addEventListener('click', () => userDelete(teste.id));
+        divEachHistory.appendChild(p)
         p.appendChild(btnExcluir);
 
-        historicoDiv.appendChild(p);
+        div.appendChild(divEachHistory);
     });
 }
-
-let id = 0;
 
 function formSend() {
-    const inputPeso = parseFloat(document.querySelector('.inputPeso').value);
-    const inputAltura = parseFloat(document.querySelector('.inputAltura').value);
-    const dataTeste = new Date();
-    const inputNome = document.querySelector('.inputName').value;
+  const inputPeso = parseFloat(document.querySelector('.inputPeso').value);
+  const inputAltura = parseFloat(document.querySelector('.inputAltura').value);
+  const dataTeste = new Date();
+  const inputNome = document.querySelector('.inputName').value;
+  if (inputPeso !== typeof Number || inputNome !== typeof string || inputAltura !== typeof Number) {
+    alert('Todos os campos devem ser preenchidos corretamente!')
+  } else {
+    const imc = ImcCalculate(inputPeso, inputAltura);
 
-    const imc = calcularIMC(inputPeso, inputAltura);
-
-    id = id + 1;
-    historico.push({
-        id: id,
-        nome: inputNome,
-        peso: inputPeso,
-        altura: inputAltura,
-        imc: imc,
-        data: dataTeste
-    });
-
-    createTask(inputNome, inputPeso, inputAltura, imc, dataTeste)
-    mostrarHistorico();
+    createUser(inputNome, inputPeso, inputAltura, imc, dataTeste)
+    showHistory();
+  }
 }
 
-function excluirTeste(index) {
-  const id = historico[index].id;
-  historico.splice(index, 1); 
-  mostrarHistorico(); 
-  deleteTask(id);
-}
-
-function deleteTask(id) {
+function userDelete(id) {
   fetch(`http://localhost:3322/api/users/${id}`, { method: 'DELETE' })
     .then(() => {
-      getAllTasks()
+      getAllUsers()
     })
 }
 
-function createTask(nome, peso, altura, imc, data) {
+function createUser(nome, peso, altura, imc, data) {
     fetch('http://localhost:3322/api/users/', {
       method: 'POST',
       headers: {
@@ -90,7 +77,7 @@ function createTask(nome, peso, altura, imc, data) {
       body: JSON.stringify({ nome, peso, altura, imc, data })
     })
       .then(() => {
-        getAllTasks()
+        getAllUsers()
       })
 }
 
@@ -103,7 +90,7 @@ function updateTask(id, nome, peso, altura, imc, data) {
       body: JSON.stringify({ nome, peso, altura, imc, data })
     })
       .then(() => {
-        getAllTasks()
+        getAllUsers()
       })
 }
 
@@ -111,11 +98,9 @@ function mountTask() {
     formSend()
 }
 
-function getAllTasks() {
+function getAllUsers() {
     fetch('http://localhost:3322/api/users')
       .then((response) => response.json())
-      .then(() => {
-        mostrarHistorico();
-      })
+      .then(data => showHistory(data))
 }
-getAllTasks()
+getAllUsers()
