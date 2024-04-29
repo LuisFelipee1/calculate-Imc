@@ -51,7 +51,7 @@ function formSend() {
   const inputAltura = parseFloat(document.querySelector('.inputAltura').value);
   const dataTeste = new Date();
   const inputNome = document.querySelector('.inputName').value;
-  if (inputPeso !== typeof Number || inputNome !== typeof string || inputAltura !== typeof Number) {
+  if (inputPeso === undefined || inputAltura === undefined) {
     alert('Todos os campos devem ser preenchidos corretamente!')
   } else {
     const imc = ImcCalculate(inputPeso, inputAltura);
