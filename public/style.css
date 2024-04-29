@@ -53,7 +53,7 @@ input:hover {
     cursor: pointer;
     padding: 7px;
     border-radius: 4px;
-    margin: 5px;
+    margin: 10px;
     transition: 0.5s;
 }
 
@@ -72,29 +72,38 @@ input:hover {
 }
 
 .historico {
+    overflow-y: scroll;
+}
+
+.eachUser {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     margin: 10px;
-    overflow-y: scroll;
+    
 }
 
-
-p {
-    flex-grow: 1;
-    flex-basis: 200;
-    padding: 15px;
-}
-
-.eachUser {
+.simple {
     margin: 10px;
+    padding: 10px;
     background-color: white;
-    border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
-    transition: 1s;
+    border-radius: 10px;
 }
 
-.eachUser:hover {
-    transform: scale(1.1);
+form p {
+    margin: 10px;
+}
+
+.ps {
+    display: flex;
+    
+}
+
+.ps p {
+    margin: 0px 5px;
+}
+
+h2 {
+    margin: 5px;
 }

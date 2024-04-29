@@ -1,3 +1,5 @@
+const app = angular.module('imc-app', [])
+
 function ImcCalculate(peso, altura) {
     const alturaMetros = altura / 100; 
     return peso / (alturaMetros * alturaMetros);
@@ -15,92 +17,39 @@ function imcFilter(imc) {
     }
 }
 
-function formatarData(data) {
-    data = new Date(data);
-    const dia = String(data.getDate()).padStart(2, '0');
-    const mes = String(data.getMonth() + 1).padStart(2, '0');
-    const ano = data.getFullYear();
-    return `${dia}/${mes}/${ano}`;
-}
+app.controller('imc-controller', ($scope, $http) => {
+    $scope.userName = ''
+    $scope.userPeso = ''
+    $scope.userAltura = ''
+    $scope.data = ''
+    $scope.userList = [];
 
-function showHistory(param) {
-    const div = document.querySelector('.historico');
-    div.innerHTML = '';
+    $scope.addTask = () => {
+        if(!$scope.userName) {
+            return alert('DIGITE UM NOME!!')
+        }
+        $scope.imc = ImcCalculate($scope.userPeso, $scope.userAltura)
+        $scope.classificacao = imcFilter($scope.imc)
+        $scope.data = new Date()
+        $http.post('http://localhost:3322/api/users', { nome: $scope.userName, peso: $scope.userPeso, altura: $scope.userAltura, imc: $scope.imc, data: $scope.data })
+            .then(() => {
+                $scope.loadTaskList()
+            }, () => {
+                alert('OPS ACONTECEU UM ERRO!')
+            });
+    }
 
-    param.forEach((teste) => {
-        const p = document.createElement('p');
-        const dataFormatada = formatarData(teste.data);
-        const classificacao = imcFilter(teste.imc);
-        p.innerHTML = `Nome: ${teste.nome}<br> Data do teste: ${dataFormatada}<br> Peso: ${teste.peso} kg <br> Altura: ${teste.altura} cm<br> IMC: ${teste.imc.toFixed(2)}<br> Classificação: ${classificacao}<br>`;
-        
-        const divEachHistory = document.createElement('div');
-        divEachHistory.classList.add('eachUser')
-        const btnExcluir = document.createElement('button');
-        btnExcluir.classList.add('excluir');
-        btnExcluir.textContent = 'Excluir';
-        btnExcluir.addEventListener('click', () => userDelete(teste.id));
-        divEachHistory.appendChild(p)
-        p.appendChild(btnExcluir);
+    $scope.loadTaskList = async () => {
+        const { data } = await $http.get('http://localhost:3322/api/users');
+        console.log(data);
+        $scope.userList = data
+        $scope.$apply();
+    }
+    $scope.loadTaskList();
 
-        div.appendChild(divEachHistory);
-    });
-}
-
-function formSend() {
-  const inputPeso = parseFloat(document.querySelector('.inputPeso').value);
-  const inputAltura = parseFloat(document.querySelector('.inputAltura').value);
-  const dataTeste = new Date();
-  const inputNome = document.querySelector('.inputName').value;
-  if (inputPeso === undefined || inputAltura === undefined) {
-    alert('Todos os campos devem ser preenchidos corretamente!')
-  } else {
-    const imc = ImcCalculate(inputPeso, inputAltura);
-
-    createUser(inputNome, inputPeso, inputAltura, imc, dataTeste)
-    showHistory();
-  }
-}
-
-function userDelete(id) {
-  fetch(`http://localhost:3322/api/users/${id}`, { method: 'DELETE' })
-    .then(() => {
-      getAllUsers()
-    })
-}
-
-function createUser(nome, peso, altura, imc, data) {
-    fetch('http://localhost:3322/api/users/', {
-      method: 'POST',
-      headers: {
-         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ nome, peso, altura, imc, data })
-    })
-      .then(() => {
-        getAllUsers()
-      })
-}
-
-function updateTask(id, nome, peso, altura, imc, data) {
-    fetch('http://localhost:3322/api/users/' + id, {
-      method: 'PATCH',
-      headers: {
-         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ nome, peso, altura, imc, data })
-    })
-      .then(() => {
-        getAllUsers()
-      })
-}
-
-function mountTask() {
-    formSend()
-}
-
-function getAllUsers() {
-    fetch('http://localhost:3322/api/users')
-      .then((response) => response.json())
-      .then(data => showHistory(data))
-}
-getAllUsers()
+    $scope.excluirUser = (id) => {
+        $http.delete(`http://localhost:3322/api/users/${id}`).then(() => {
+            $scope.loadTaskList();
+        })
+    }
+});

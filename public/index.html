@@ -1,25 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="imc-app">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INDICE IMC</title>
     <link rel="stylesheet" href="./style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.8.3/angular-locale_pt-br.min.js></script>
 </head>
-<body>
+
+<body ng-controller="imc-controller">
     <div class="all">
         <div class="imc">
             <h1>CALCULADORA DE IMC</h1>
             <h3>Qual seu nome ?</h3>
-            <input type="text" class="inputName">
+            <input ng-model="userName" type="text" class="inputName">
             <h3>Quanto você pesa atualmente ?</h3>
-            <input type="text" class="inputPeso">
+            <input ng-model="userPeso" type="text" class="inputPeso">
             <h3>Qual é a sua altura ?</h3>
-            <input type="text" class="inputAltura"><br>
-            <button onclick="formSend()" class="enviar">Enviar</button>
+            <input ng-model="userAltura" type="text" class="inputAltura"><br>
+            <button ng-click="addTask()" class="enviar">Enviar</button>
         </div>
-        <div class="historico"></div>
+        <div class="historico">
+            <div class="eachUser">
+                <label for="" class="simple" ng-repeat="user in userList">
+                    <h2>{{ user.nome }}</h2>
+                    <div class="ps">
+                        <p>Altura: {{ user.altura }}</p>
+                        <p>Peso: {{ user.peso }}kg</p>
+                    </div>
+                    <p>Imc: {{ user.imc }}</p>
+                    <p>Data: {{user.data | date:"dd/MM/yyyy":"pt-BR"}}</p>
+                    <p>Classificação: {{ classificacao }}</p>
+                    <button class="excluir" ng-click="excluirUser(user.id)">excluir</button>
+                </label>
+            </div>
+        </div>
     </div>
     <script src="./script.js"></script>
 </body>
+
 </html>
